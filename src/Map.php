@@ -46,7 +46,7 @@ class Map
     /**
      * @param int $index
      */
-    public function normalRotate(int $index)
+    private function normalRotate(int $index)
     {
         $element = array_shift($this->matrix[$index]);
         $this->matrix[$index][] = $element;
@@ -55,13 +55,13 @@ class Map
     /**
      * @param int $index
      */
-    public function reverseRotate(int $index)
+    private function reverseRotate(int $index)
     {
         $element = array_pop($this->matrix[$index]);
         array_unshift($this->matrix[$index], $element);
     }
 
-    public function transpose()
+    private function transpose()
     {
         for ($i = 0; $i < count($this->matrix); $i++) {
             for ($j = 0; $j < count($this->matrix); $j++) {

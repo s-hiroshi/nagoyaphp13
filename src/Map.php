@@ -1,91 +1,92 @@
 <?php
 
+
 namespace Ttskch\Nagoyaphp13;
+
 
 class Map
 {
-    private $cells = [
-        1 => 1,
-        2 => 2,
-        3 => 3,
-        4 => 4,
-        5 => 5,
-        6 => 6,
-        7 => 7,
-        8 => 8,
-        9 => 9,
+    private $matrix = [
+        [1, 2, 3],
+        [4, 5, 6],
+        [7, 8, 9],
     ];
 
-    public function a()
+    private $instruction = [
+        'a' => [0, 'normalRotate', false],
+        'b' => [1, 'normalRotate', false],
+        'c' => [2, 'normalRotate', false],
+        'd' => [0, 'reverseRotate', true],
+        'e' => [1, 'reverseRotate', true],
+        'f' => [2, 'reverseRotate', true],
+        'g' => [2, 'reverseRotate', false],
+        'h' => [1, 'reverseRotate', false],
+        'i' => [0, 'reverseRotate', false],
+        'j' => [2, 'normalRotate', true],
+        'k' => [1, 'normalRotate', true],
+        'l' => [0, 'normalRotate', true],
+    ];
+
+    /**
+     * @param string $command
+     */
+    public function rotate(string $command)
     {
-        $this->rotate(1, 2, 3);
+        list($index, $callable, $isTranspose) = $this->instruction[$command];
+
+        if ($isTranspose) {
+            $this->transpose();
+            call_user_func([$this, $callable], $index);
+            $this->transpose();
+            return;
+        }
+        call_user_func([$this, $callable], $index);
     }
 
-    public function b()
+    /**
+     * @param int $index
+     */
+    public function normalRotate(int $index)
     {
-        $this->rotate(4, 5, 6);
+        $element = array_shift($this->matrix[$index]);
+        $this->matrix[$index][] = $element;
     }
 
-    public function c()
+    /**
+     * @param int $index
+     */
+    public function reverseRotate(int $index)
     {
-        $this->rotate(7, 8, 9);
+        $element = array_pop($this->matrix[$index]);
+        array_unshift($this->matrix[$index], $element);
     }
 
-    public function d()
+    public function transpose()
     {
-        $this->rotate(7, 4, 1);
+        for ($i = 0; $i < count($this->matrix); $i++) {
+            for ($j = 0; $j < count($this->matrix); $j++) {
+                if ($i == 0) {
+                    $transposeMatrix[$j] = [];
+                }
+                $transposeMatrix[$j][$i] = $this->matrix[$i][$j];
+            }
+        }
+
+        $this->matrix = $transposeMatrix;
     }
 
-    public function e()
+    /**
+     * @return string
+     */
+    public function format(): string
     {
-        $this->rotate(8, 5, 2);
-    }
-
-    public function f()
-    {
-        $this->rotate(9, 6, 3);
-    }
-
-    public function g()
-    {
-        $this->rotate(9, 8, 7);
-    }
-
-    public function h()
-    {
-        $this->rotate(6, 5, 4);
-    }
-
-    public function i()
-    {
-        $this->rotate(3, 2, 1);
-    }
-
-    public function j()
-    {
-        $this->rotate(3, 6, 9);
-    }
-
-    public function k()
-    {
-        $this->rotate(2, 5, 8);
-    }
-
-    public function l()
-    {
-        $this->rotate(1, 4, 7);
-    }
-
-    public function __toString(): string
-    {
-        return sprintf('%d%d%d/%d%d%d/%d%d%d', $this->cells[1], $this->cells[2], $this->cells[3], $this->cells[4], $this->cells[5], $this->cells[6], $this->cells[7], $this->cells[8], $this->cells[9]);
-    }
-
-    private function rotate(int $index1, int $index2, int $index3)
-    {
-        $buf = $this->cells[$index1];
-        $this->cells[$index1] = $this->cells[$index2];
-        $this->cells[$index2] = $this->cells[$index3];
-        $this->cells[$index3] = $buf;
+        $output = '';
+        foreach($this->matrix as $index => $row) {
+            $output .= implode('', $row);
+            if ($index < count($this->matrix) - 1) {
+                $output .= '/';
+            }
+        }
+        return $output;
     }
 }
